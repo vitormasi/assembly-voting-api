@@ -47,7 +47,7 @@ public class AgendaServiceImpl implements AgendaService {
                 .orElseThrow(() -> new EntityNotFoundException("Pauta não encontrada"));
 
         if (ObjectUtils.isNotEmpty(agenda.getStartAt()) || ObjectUtils.isNotEmpty(agenda.getEndAt())) {
-            throw new IllegalStateException("Pauta já está aberta para votação");
+            throw new IllegalStateException("Pauta já foi aberta para votação");
         }
 
         AgendaDTO agendaDTO = AgendaMapper.toDTO(agenda);
@@ -64,6 +64,12 @@ public class AgendaServiceImpl implements AgendaService {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
         return agendaRepository.findAllByDateTimeBetweenStartAtAndEndAt(LocalDateTime.now(), pageable)
                 .map(AgendaMapper::toDTO);
+    }
+
+    @Override
+    public Agenda findById(Long id) {
+        return agendaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pauta não encontrada"));
     }
 
     private void createValidDates(AgendaDTO agendaDTO) {

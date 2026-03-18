@@ -1,0 +1,31 @@
+package com.sicredi.assemblyVotingApi.controller;
+
+import com.sicredi.assemblyVotingApi.entity.dto.VoteDTO;
+import com.sicredi.assemblyVotingApi.entity.enumeration.VoteEnum;
+import com.sicredi.assemblyVotingApi.service.VoteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/vote")
+@AllArgsConstructor
+@Tag(name = "Vote", description = "Operações relacionadas às votações de pautas")
+public class VoteController {
+
+    private final VoteService voteService;
+
+    @PostMapping("/agenda/{agendaId}")
+    @Operation(summary = "Registrar Voto", description = "Cria um registro de voto para uma pauta específica")
+    public ResponseEntity<VoteDTO> createVote(
+            @PathVariable Long agendaId,
+            @RequestParam String cpf,
+            @RequestParam VoteEnum voteEnum
+            ) {
+        return new ResponseEntity<>(voteService.createVote(agendaId, cpf, voteEnum), HttpStatus.CREATED);
+    }
+
+}
