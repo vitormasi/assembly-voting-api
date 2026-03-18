@@ -1,4 +1,4 @@
-package com.sicredi.assembly_voting_api;
+package com.sicredi.assemblyVotingApi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

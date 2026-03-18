@@ -1,4 +1,4 @@
-package com.sicredi.assembly_voting_api;
+package com.sicredi.assemblyVotingApi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
