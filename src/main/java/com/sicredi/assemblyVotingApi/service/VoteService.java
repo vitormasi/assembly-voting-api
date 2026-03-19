@@ -7,4 +7,6 @@ public interface VoteService {
 
     VoteDTO createVote(Long agendaId, String cpf, VoteEnum voteEnum) throws Exception;
 
+    VoteDTO createVoteV2(Long agendaId, String cpf, VoteEnum voteEnum) throws Exception;
+
 }

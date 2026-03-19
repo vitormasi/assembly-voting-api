@@ -1,5 +1,6 @@
 package com.sicredi.assemblyVotingApi.controller;
 
+import com.sicredi.assemblyVotingApi.config.ApiVersionConstants;
 import com.sicredi.assemblyVotingApi.entity.dto.VoteDTO;
 import com.sicredi.assemblyVotingApi.entity.enumeration.VoteEnum;
 import com.sicredi.assemblyVotingApi.service.VoteService;
@@ -11,21 +12,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/vote")
+@RequestMapping(ApiVersionConstants.V2 + "/vote")
 @AllArgsConstructor
 @Tag(name = "Vote", description = "Operações relacionadas às votações de pautas")
-public class VoteController {
+public class VoteControllerV2 {
 
     private final VoteService voteService;
 
     @PostMapping("/agenda/{agendaId}")
     @Operation(summary = "Registrar Voto", description = "Cria um registro de voto para uma pauta específica")
-    public ResponseEntity<VoteDTO> createVote(
+    public ResponseEntity<VoteDTO> createVoteV2(
             @PathVariable Long agendaId,
             @RequestParam String cpf,
             @RequestParam VoteEnum voteEnum
             ) throws Exception {
-        return new ResponseEntity<>(voteService.createVote(agendaId, cpf, voteEnum), HttpStatus.CREATED);
+        return new ResponseEntity<>(voteService.createVoteV2(agendaId, cpf, voteEnum), HttpStatus.CREATED);
     }
 
 }
