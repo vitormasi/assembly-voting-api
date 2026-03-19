@@ -21,20 +21,25 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgendaResultDTO {
 
+    @Schema(description = "Identificador único da pauta", example = "1")
     private Long id;
 
+    @Schema(description = "Título da pauta", example = "Aprovação do orçamento anual")
     private String title;
 
-    @Schema(type = "string", example = "01/01/2025 08:00:00")
+    @Schema(description = "Data/hora de início da votação da pauta", example = "01/01/2025 08:00:00")
     private LocalDateTime startAt;
 
-    @Schema(type = "string", example = "01/01/2025 08:00:00")
+    @Schema(description = "Data/hora de fim da votação da pauta", example = "01/01/2025 08:00:00")
     private LocalDateTime endAt;
 
+    @Schema(description = "Status atual da pauta", example = "IN_PROGRESS")
     private StatusEnum status;
 
+    @Schema(description = "Resultado da votação da pauta (maioria dos votos)", example = "SIM")
     private VoteEnum result;
 
+    @Schema(description = "Contagem de votos por opção (SIM, NAO)", example = "{\"SIM\": 10, \"NAO\": 5}")
     private Map<String, Long> votesCount;
 
 }

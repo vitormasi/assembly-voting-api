@@ -5,6 +5,7 @@ import com.sicredi.assemblyVotingApi.entity.dto.VoteDTO;
 import com.sicredi.assemblyVotingApi.entity.enumeration.VoteEnum;
 import com.sicredi.assemblyVotingApi.service.VoteService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,9 @@ public class VoteControllerV2 {
     @Operation(summary = "Registrar Voto", description = "Cria um registro de voto para uma pauta específica")
     public ResponseEntity<VoteDTO> createVoteV2(
             @PathVariable Long agendaId,
+            @Schema(description = "CPF do eleitor", example = "12345678900")
             @RequestParam @NotBlank String cpf,
+            @Schema(description = "Valor do voto (SIM ou NAO)", example = "NAO")
             @RequestParam VoteEnum voteEnum
     ) throws Exception {
         return new ResponseEntity<>(voteService.createVoteV2(agendaId, cpf, voteEnum), HttpStatus.CREATED);

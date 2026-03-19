@@ -19,13 +19,16 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class VoteDTO {
 
+    @Schema(description = "Identificador único do voto", example = "1")
     private String cpf;
 
+    @Schema(description = "Valor do voto (SIM ou NAO)", example = "NAO")
     private VoteEnum vote;
 
-    @Schema(type = "string", example = "01/01/2025 08:00:00")
+    @Schema(description = "Data do registro do voto", example = "01/01/2025 08:00:00")
     private LocalDateTime creationDate;
 
+    @Schema(description = "Identificador da pauta associada ao voto", example = "1")
     private Long agendaId;
 
 }

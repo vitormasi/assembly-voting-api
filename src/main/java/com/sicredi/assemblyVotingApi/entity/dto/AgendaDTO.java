@@ -19,15 +19,17 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgendaDTO {
 
+    @Schema(description = "Identificador único da pauta", example = "1")
     private Long id;
 
     @NotBlank(message = "Título é obrigatório")
+    @Schema(description = "Título da pauta", example = "Aprovação do orçamento anual")
     private String title;
 
-    @Schema(type = "string", example = "01/01/2025 08:00:00")
+    @Schema(description = "Data/hora de início da votação", example = "01/01/2025 08:00:00")
     private LocalDateTime startAt;
 
-    @Schema(type = "string", example = "01/01/2025 08:00:00")
+    @Schema(description = "Data/hora de encerramento da votação", example = "01/01/2025 09:00:00")
     private LocalDateTime endAt;
 
 }
