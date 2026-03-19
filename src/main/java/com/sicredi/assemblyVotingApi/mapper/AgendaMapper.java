@@ -3,8 +3,6 @@ package com.sicredi.assemblyVotingApi.mapper;
 import com.sicredi.assemblyVotingApi.entity.Agenda;
 import com.sicredi.assemblyVotingApi.entity.dto.AgendaDTO;
 
-import java.util.List;
-
 public class AgendaMapper {
 
     public static Agenda toEntity(AgendaDTO agendaDTO) {
@@ -31,16 +29,6 @@ public class AgendaMapper {
                 .startAt(agenda.getStartAt())
                 .endAt(agenda.getEndAt())
                 .build();
-    }
-
-    public static List<AgendaDTO> toDTOList (List<Agenda> agendaList) {
-        if (agendaList == null) {
-            return null;
-        }
-
-        return agendaList.stream()
-                .map(AgendaMapper::toDTO)
-                .toList();
     }
 
 }

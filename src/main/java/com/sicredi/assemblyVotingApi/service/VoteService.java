@@ -5,6 +5,6 @@ import com.sicredi.assemblyVotingApi.entity.enumeration.VoteEnum;
 
 public interface VoteService {
 
-    VoteDTO createVote(Long agendaId, String cpf, VoteEnum voteEnum);
+    VoteDTO createVote(Long agendaId, String cpf, VoteEnum voteEnum) throws Exception;
 
 }

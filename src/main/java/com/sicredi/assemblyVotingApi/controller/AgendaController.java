@@ -1,6 +1,7 @@
 package com.sicredi.assemblyVotingApi.controller;
 
 import com.sicredi.assemblyVotingApi.entity.dto.AgendaDTO;
+import com.sicredi.assemblyVotingApi.entity.dto.AgendaResultDTO;
 import com.sicredi.assemblyVotingApi.service.AgendaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -65,6 +66,12 @@ public class AgendaController {
             @RequestParam(defaultValue = "10") int size
     ) {
         return new ResponseEntity<>(agendaService.getAllOpened(page, size), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/result")
+    @Operation(summary = "Buscar resultado da votação", description = "Retorna o resultado da votação de uma pauta específica")
+    public ResponseEntity<AgendaResultDTO> getResultById(@PathVariable Long id) {
+        return new ResponseEntity<>(agendaService.getResultById(id), HttpStatus.OK);
     }
 
 }

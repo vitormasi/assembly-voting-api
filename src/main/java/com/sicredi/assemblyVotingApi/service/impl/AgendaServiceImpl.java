@@ -2,7 +2,9 @@ package com.sicredi.assemblyVotingApi.service.impl;
 
 import com.sicredi.assemblyVotingApi.entity.Agenda;
 import com.sicredi.assemblyVotingApi.entity.dto.AgendaDTO;
+import com.sicredi.assemblyVotingApi.entity.dto.AgendaResultDTO;
 import com.sicredi.assemblyVotingApi.mapper.AgendaMapper;
+import com.sicredi.assemblyVotingApi.mapper.AgendaResultMapper;
 import com.sicredi.assemblyVotingApi.repository.AgendaRepository;
 import com.sicredi.assemblyVotingApi.service.AgendaService;
 import jakarta.persistence.EntityNotFoundException;
@@ -70,6 +72,12 @@ public class AgendaServiceImpl implements AgendaService {
     public Agenda findById(Long id) {
         return agendaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Pauta não encontrada"));
+    }
+
+    @Override
+    public AgendaResultDTO getResultById(Long id) {
+        Agenda agenda = findById(id);
+        return AgendaResultMapper.toAgendaResultDTO(agenda);
     }
 
     private void createValidDates(AgendaDTO agendaDTO) {

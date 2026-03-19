@@ -6,6 +6,7 @@ import com.sicredi.assemblyVotingApi.entity.dto.VoteDTO;
 import com.sicredi.assemblyVotingApi.entity.enumeration.VoteEnum;
 import com.sicredi.assemblyVotingApi.mapper.VoteMapper;
 import com.sicredi.assemblyVotingApi.repository.VoteRepository;
+import com.sicredi.assemblyVotingApi.utils.CpfUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
@@ -21,18 +22,12 @@ public class VoteServiceImpl implements VoteService {
     private final VoteRepository voteRepository;
 
     @Override
-    public VoteDTO createVote(Long agendaId, String cpf, VoteEnum voteEnum) {
+    public VoteDTO createVote(Long agendaId, String cpf, VoteEnum voteEnum) throws Exception {
         Agenda agenda = checkAgenda(agendaId);
+        cpf = CpfUtils.onlyNumbers(cpf);
         checkCpfCanVote(agenda, cpf);
 
-        Vote vote = Vote.builder()
-                .cpf(cpf)
-                .agenda(agenda)
-                .vote(voteEnum)
-                .creationDate(LocalDateTime.now())
-                .build();
-
-        voteRepository.save(vote);
+        Vote vote = voteRepository.save(VoteMapper.toEntity(agenda, cpf, voteEnum));
 
         return VoteMapper.toDTO(vote);
     }
