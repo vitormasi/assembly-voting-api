@@ -24,9 +24,16 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.isNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AgendaController.class)
 @ActiveProfiles("test")
@@ -164,13 +171,13 @@ class AgendaControllerTest {
     @Test
     void shouldOpenAgenda_withStartAtAndEndAt_andReturnOk() throws Exception {
         LocalDateTime startAt = LocalDateTime.of(2026, 3, 18, 14, 30, 0);
-        LocalDateTime endAt   = LocalDateTime.of(2026, 3, 18, 15, 30, 0);
+        LocalDateTime endAt = LocalDateTime.of(2026, 3, 18, 15, 30, 0);
 
         when(agendaService.startAgenda(eq(1L), eq(startAt), eq(endAt))).thenReturn(agendaDTO);
 
         mockMvc.perform(patch("/agenda/{id}/open", 1L)
                         .param("startAt", "18/03/2026 14:30:00")
-                        .param("endAt",   "18/03/2026 15:30:00"))
+                        .param("endAt", "18/03/2026 15:30:00"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Pauta Teste"));
 
