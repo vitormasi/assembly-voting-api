@@ -11,6 +11,7 @@ import com.sicredi.assemblyVotingApi.repository.VoteRepository;
 import com.sicredi.assemblyVotingApi.service.AgendaService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AgendaServiceImpl implements AgendaService {
 
     private final AgendaRepository agendaRepository;
@@ -29,9 +31,17 @@ public class AgendaServiceImpl implements AgendaService {
 
     @Override
     public AgendaDTO create(AgendaDTO agendaDTO) {
-        checkDates(agendaDTO);
-        Agenda agenda = agendaRepository.save(AgendaMapper.toEntity(agendaDTO));
-        return AgendaMapper.toDTO(agenda);
+        try {
+            checkDates(agendaDTO);
+            Agenda agenda = agendaRepository.save(AgendaMapper.toEntity(agendaDTO));
+            return AgendaMapper.toDTO(agenda);
+        } catch (IllegalArgumentException e) {
+            log.warn("Datas inválidas ao criar pauta: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro inesperado ao criar pauta: {}", e.getMessage());
+            throw e;
+        }
     }
 
     @Override
@@ -50,21 +60,32 @@ public class AgendaServiceImpl implements AgendaService {
 
     @Override
     public AgendaDTO startAgenda(Long id, LocalDateTime startAt, LocalDateTime endAt) {
-        Agenda agenda = agendaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Pauta não encontrada"));
+        try {
+            Agenda agenda = agendaRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Pauta não encontrada"));
 
-        if (ObjectUtils.isNotEmpty(agenda.getStartAt()) || ObjectUtils.isNotEmpty(agenda.getEndAt())) {
-            throw new IllegalStateException("Pauta já foi aberta para votação");
+            if (ObjectUtils.isNotEmpty(agenda.getStartAt()) || ObjectUtils.isNotEmpty(agenda.getEndAt())) {
+                throw new IllegalStateException("Pauta já foi aberta para votação");
+            }
+
+            AgendaDTO agendaDTO = AgendaMapper.toDTO(agenda);
+            agendaDTO.setStartAt(startAt);
+            agendaDTO.setEndAt(endAt);
+            checkDates(agendaDTO);
+            createDatesWhenNull(agendaDTO);
+
+            Agenda updatedAgenda = agendaRepository.save(AgendaMapper.toEntity(agendaDTO));
+            return AgendaMapper.toDTO(updatedAgenda);
+        }  catch (EntityNotFoundException e) {
+            log.warn("Pauta não encontrada ao abrir votação: id={}", id);
+            throw e;
+        } catch (IllegalStateException e) {
+            log.warn("Tentativa de reabrir pauta já aberta: id={}", id);
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro inesperado ao abrir pauta: id={} | {}", id, e.getMessage());
+            throw e;
         }
-
-        AgendaDTO agendaDTO = AgendaMapper.toDTO(agenda);
-        agendaDTO.setStartAt(startAt);
-        agendaDTO.setEndAt(endAt);
-        checkDates(agendaDTO);
-        createDatesWhenNull(agendaDTO);
-
-        Agenda updatedAgenda = agendaRepository.save(AgendaMapper.toEntity(agendaDTO));
-        return AgendaMapper.toDTO(updatedAgenda);
     }
 
     @Override
@@ -76,17 +97,25 @@ public class AgendaServiceImpl implements AgendaService {
 
     @Override
     public AgendaResultDTO getResultById(Long id) {
-        Agenda agenda = agendaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Pauta não encontrada"));
+        try {
+            Agenda agenda = agendaRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Pauta não encontrada"));
 
-        Map<VoteEnum, Long> votesCounts = voteRepository.countVotesByAgendaId(id)
-                .stream()
-                .collect(Collectors.toMap(
-                        row -> (VoteEnum) row[0],
-                        row -> (Long) row[1]
-                ));
+            Map<VoteEnum, Long> votesCounts = voteRepository.countVotesByAgendaId(id)
+                    .stream()
+                    .collect(Collectors.toMap(
+                            row -> (VoteEnum) row[0],
+                            row -> (Long) row[1]
+                    ));
 
-        return AgendaResultMapper.toAgendaResultDTO(agenda, votesCounts);
+            return AgendaResultMapper.toAgendaResultDTO(agenda, votesCounts);
+        } catch (EntityNotFoundException e) {
+            log.warn("Pauta não encontrada ao buscar resultado: id={}", id);
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro inesperado ao buscar resultado: id={} | {}", id, e.getMessage());
+            throw e;
+        }
     }
 
     private void checkDates(AgendaDTO agendaDTO) {

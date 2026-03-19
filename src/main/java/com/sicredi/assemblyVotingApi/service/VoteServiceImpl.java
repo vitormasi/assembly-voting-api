@@ -30,25 +30,41 @@ public class VoteServiceImpl implements VoteService {
 
     @Override
     public VoteDTO createVote(Long agendaId, String cpf, VoteEnum voteEnum) throws Exception {
-        Agenda agenda = checkAgenda(agendaId);
-        cpf = CpfUtils.onlyNumbers(cpf);
-        checkCpfAlreadyVote(agenda, cpf);
+        try {
+            Agenda agenda = checkAgenda(agendaId);
+            cpf = CpfUtils.onlyNumbers(cpf);
+            checkCpfAlreadyVote(agenda, cpf);
 
-        Vote vote = voteRepository.save(VoteMapper.toEntity(agenda, cpf, voteEnum));
+            Vote vote = voteRepository.save(VoteMapper.toEntity(agenda, cpf, voteEnum));
 
-        return VoteMapper.toDTO(vote);
+            return VoteMapper.toDTO(vote);
+        } catch (EntityNotFoundException | IllegalStateException e) {
+            log.warn("Voto não permitido: agendaId={} | {}", agendaId, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro inesperado ao registrar voto: agendaId={} | {}", agendaId, e.getMessage());
+            throw e;
+        }
     }
 
     @Override
     public VoteDTO createVoteV2(Long agendaId, String cpf, VoteEnum voteEnum) throws Exception {
-        Agenda agenda = checkAgenda(agendaId);
-        cpf = CpfUtils.onlyNumbers(cpf);
-        checkCpfCanVote(cpf);
-        checkCpfAlreadyVote(agenda, cpf);
+        try {
+            Agenda agenda = checkAgenda(agendaId);
+            cpf = CpfUtils.onlyNumbers(cpf);
+            checkCpfCanVote(cpf);
+            checkCpfAlreadyVote(agenda, cpf);
 
-        Vote vote = voteRepository.save(VoteMapper.toEntity(agenda, cpf, voteEnum));
+            Vote vote = voteRepository.save(VoteMapper.toEntity(agenda, cpf, voteEnum));
 
-        return VoteMapper.toDTO(vote);
+            return VoteMapper.toDTO(vote);
+        } catch (EntityNotFoundException | IllegalStateException e) {
+            log.warn("Voto v2 não permitido: agendaId={} | {}", agendaId, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro inesperado ao registrar voto v2: agendaId={} | {}", agendaId, e.getMessage());
+            throw e;
+        }
     }
 
     private Agenda checkAgenda(Long agendaId) {
@@ -83,9 +99,11 @@ public class VoteServiceImpl implements VoteService {
             if (!response.getStatus().equals(CpfStatusEnum.ABLE_TO_VOTE)) {
                 throw new IllegalStateException("CPF não habilitado para votar");
             }
+        } catch (IllegalStateException e) {
+            throw e;
         } catch (Exception e) {
-            log.error("Erro ao validar CPF: Serviço para validação de CPF indisponível", e.getMessage());
-            throw new Exception("Erro ao validar CPF: " + "Serviço para validação de CPF indisponível");
+            log.error("Serviço de validação de CPF indisponível: {}", e.getMessage(), e);
+            throw new Exception("Erro ao validar CPF: Serviço para validação de CPF indisponível");
         }
     }
 }
