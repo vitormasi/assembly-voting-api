@@ -1,8 +1,8 @@
 package com.sicredi.assemblyVotingApi.config;
 
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -10,10 +10,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 
 @Configuration
-public class JacksonConfig {
-
-    private static final DateTimeFormatter OUTPUT_FORMATTER =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+public class WebMvcConfig implements WebMvcConfigurer {
 
     private static final DateTimeFormatter INPUT_FORMATTER = new DateTimeFormatterBuilder()
             .appendPattern("dd/MM/yyyy")
@@ -25,11 +22,9 @@ public class JacksonConfig {
             .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
             .toFormatter();
 
-    @Bean
-    public SimpleModule localDateTimeModule() {
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(INPUT_FORMATTER));
-        module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(OUTPUT_FORMATTER));
-        return module;
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(String.class, LocalDateTime.class,
+                source -> LocalDateTime.parse(source.trim(), INPUT_FORMATTER));
     }
 }

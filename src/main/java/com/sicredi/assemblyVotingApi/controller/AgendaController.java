@@ -5,11 +5,11 @@ import com.sicredi.assemblyVotingApi.entity.dto.AgendaResultDTO;
 import com.sicredi.assemblyVotingApi.service.AgendaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,9 +51,9 @@ public class AgendaController {
     @Operation(summary = "Abrir pauta para votação", description = "Abre uma pauta para votação, definindo o horário de início e duração da votação")
     public ResponseEntity<AgendaDTO> open(
             @PathVariable Long id,
-            @Parameter(description = "Data/hora de início da votação. Formato: yyyy-MM-dd'T'HH:mm:ss (ex: 2024-01-15T10:00:00)")
+            @Parameter(description = "Data/hora de início da votação", schema = @Schema(type = "string", example = "18/03/2026 14:30:00"))
             @RequestParam(required = false) LocalDateTime startAt,
-            @Parameter(description = "Data/hora de encerramento da votação. Formato: yyyy-MM-dd'T'HH:mm:ss (ex: 2024-01-15T11:00:00)")
+            @Parameter(description = "Data/hora de encerramento da votação", schema = @Schema(type = "string", example = "18/03/2026 14:30:00"))
             @RequestParam(required = false) LocalDateTime endAt
     ) {
         return new ResponseEntity<>(agendaService.startAgenda(id, startAt, endAt), HttpStatus.OK);

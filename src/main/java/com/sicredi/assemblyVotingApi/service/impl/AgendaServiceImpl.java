@@ -81,7 +81,11 @@ public class AgendaServiceImpl implements AgendaService {
     }
 
     private void createValidDates(AgendaDTO agendaDTO) {
-        //Votação criada com data de início ou fim
+        if (ObjectUtils.isNotEmpty(agendaDTO.getStartAt()) && ObjectUtils.isNotEmpty(agendaDTO.getEndAt())) {
+            if (agendaDTO.getStartAt().equals(agendaDTO.getEndAt())) {
+                throw new IllegalArgumentException("Data de início deve ser anterior à data de fim");
+            }
+        }
 
         //Se receber data de fim, mas não receber data de início, a data de início será a data atual
         if (ObjectUtils.isNotEmpty(agendaDTO.getEndAt()) && ObjectUtils.isEmpty(agendaDTO.getStartAt())) {
