@@ -6,6 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Table(name = "agenda")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor

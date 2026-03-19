@@ -5,6 +5,7 @@ import com.sicredi.assemblyVotingApi.entity.enumeration.VoteEnum;
 import com.sicredi.assemblyVotingApi.service.VoteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class VoteController {
     @Operation(summary = "Registrar Voto", description = "Cria um registro de voto para uma pauta específica")
     public ResponseEntity<VoteDTO> createVote(
             @PathVariable Long agendaId,
-            @RequestParam String cpf,
+            @RequestParam @NotBlank String cpf,
             @RequestParam VoteEnum voteEnum
             ) throws Exception {
         return new ResponseEntity<>(voteService.createVote(agendaId, cpf, voteEnum), HttpStatus.CREATED);

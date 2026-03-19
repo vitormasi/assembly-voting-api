@@ -8,22 +8,25 @@ import com.sicredi.assemblyVotingApi.entity.Vote;
 import com.sicredi.assemblyVotingApi.entity.dto.VoteDTO;
 import com.sicredi.assemblyVotingApi.entity.enumeration.VoteEnum;
 import com.sicredi.assemblyVotingApi.mapper.VoteMapper;
+import com.sicredi.assemblyVotingApi.repository.AgendaRepository;
 import com.sicredi.assemblyVotingApi.repository.VoteRepository;
 import com.sicredi.assemblyVotingApi.utils.CpfUtils;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class VoteServiceImpl implements VoteService {
 
-    private final AgendaService agendaService;
     private final VoteRepository voteRepository;
+    private final AgendaRepository agendaRepository;
     private final CpfValidationClient cpfValidationClient;
 
     @Override
@@ -50,7 +53,8 @@ public class VoteServiceImpl implements VoteService {
     }
 
     private Agenda checkAgenda(Long agendaId) {
-        Agenda agenda = agendaService.findById(agendaId);
+        Agenda agenda = agendaRepository.findById(agendaId)
+                .orElseThrow(() -> new EntityNotFoundException("Pauta não encontrada"));
 
         if (ObjectUtils.isNotEmpty(agenda) && ObjectUtils.isNotEmpty(agenda.getStartAt()) && ObjectUtils.isNotEmpty(agenda.getEndAt())) {
             if (LocalDateTime.now().isBefore(agenda.getStartAt()) || LocalDateTime.now().isAfter(agenda.getEndAt())) {

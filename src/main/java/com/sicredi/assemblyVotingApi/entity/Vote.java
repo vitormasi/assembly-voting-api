@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Table(name = "vote")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 public class Vote {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)

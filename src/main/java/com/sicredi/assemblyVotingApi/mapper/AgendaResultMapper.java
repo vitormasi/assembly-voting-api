@@ -1,20 +1,18 @@
 package com.sicredi.assemblyVotingApi.mapper;
 
 import com.sicredi.assemblyVotingApi.entity.Agenda;
-import com.sicredi.assemblyVotingApi.entity.Vote;
 import com.sicredi.assemblyVotingApi.entity.dto.AgendaResultDTO;
 import com.sicredi.assemblyVotingApi.entity.enumeration.StatusEnum;
 import com.sicredi.assemblyVotingApi.entity.enumeration.VoteEnum;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AgendaResultMapper {
 
-    public static AgendaResultDTO toAgendaResultDTO(Agenda agenda) {
+    public static AgendaResultDTO toAgendaResultDTO(Agenda agenda, Map<VoteEnum, Long> votesCounts) {
         if (agenda == null) {
             return null;
         }
@@ -25,8 +23,8 @@ public class AgendaResultMapper {
                 .startAt(agenda.getStartAt())
                 .endAt(agenda.getEndAt())
                 .status(defineStatus(agenda))
-                .result(defineResult(agenda.getVotes()))
-                .votesCount(defineVotesCount(agenda.getVotes()))
+                .result(defineResult(votesCounts))
+                .votesCount(defineVotesCount(votesCounts))
                 .build();
     }
 
@@ -42,12 +40,8 @@ public class AgendaResultMapper {
         return StatusEnum.FINISHED;
     }
 
-    private static VoteEnum defineResult(List<Vote> votes) {
-        if (votes == null || votes.isEmpty()) return null;
-
-        Map<VoteEnum, Long> counts = votes.stream()
-                .map(Vote::getVote)
-                .collect(Collectors.groupingBy(v -> v, Collectors.counting()));
+    private static VoteEnum defineResult(Map<VoteEnum, Long> counts) {
+        if (counts == null || counts.isEmpty()) return null;
 
         long maxCount = Collections.max(counts.values());
 
@@ -62,12 +56,13 @@ public class AgendaResultMapper {
                 .orElse(null);
     }
 
-    private static Map<String, Long> defineVotesCount(List<Vote> votes) {
-        if (votes == null || votes.isEmpty()) return Collections.emptyMap();
+    private static Map<String, Long> defineVotesCount(Map<VoteEnum, Long> counts) {
+        if (counts == null || counts.isEmpty()) return Collections.emptyMap();
 
-        return votes.stream()
-                .collect(Collectors.groupingBy(vote -> vote.getVote().name(), Collectors.counting()));
+        return counts.entrySet().stream()
+                .collect(Collectors.toMap(
+                        e -> e.getKey().name(),
+                        Map.Entry::getValue
+                ));
     }
-
-
 }
